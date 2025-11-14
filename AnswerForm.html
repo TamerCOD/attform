@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      body { font-family: Arial, sans-serif; }
+      .question-group { margin-bottom: 15px; }
+      label { display: block; font-weight: bold; margin-bottom: 5px; }
+      textarea { width: 100%; padding: 8px; box-sizing: border-box; }
+      button { padding: 10px 15px; background-color: #4285F4; color: white; border: none; cursor: pointer; }
+    </style>
+  </head>
+  <body>
+    <h2>Certification Questions</h2>
+    <div id="questions-container"></div>
+    <button onclick="submitAnswers()">Submit Answers</button>
+
+    <script>
+      const ticketId = <?= ticketId ?>;
+      const traineeName = "<?= traineeName ?>";
+      const questions = <?= JSON.stringify(questions) ?>;
+
+      // This function will be called from the server-side to populate the form
+      function createForm(questions, id, name) {
+        const container = document.getElementById('questions-container');
+        questions.forEach((q, i) => {
+          const div = document.createElement('div');
+          div.className = 'question-group';
+          div.innerHTML = `
+            <label for="answer${i}">Question ${i + 1}: ${q}</label>
+            <textarea id="answer${i}" name="answer${i}" rows="3"></textarea>
+          `;
+          container.appendChild(div);
+        });
+      }
+
+      function submitAnswers() {
+        const answers = [];
+        const textareas = document.querySelectorAll('textarea');
+        textareas.forEach(textarea => {
+          answers.push(textarea.value);
+        });
+
+        const submission = {
+          ticketId: ticketId,
+          traineeName: traineeName,
+          answers: answers
+        };
+        google.script.run.withSuccessHandler(closeDialog).gradeAnswers(submission);
+      }
+
+      function closeDialog() {
+        google.script.host.close();
+      }
+
+      // Load the questions when the form opens
+      createForm(questions, ticketId, traineeName);
+    </script>
+  </body>
+</html>

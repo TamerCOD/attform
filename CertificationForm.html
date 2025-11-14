@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      body { font-family: Arial, sans-serif; }
+      .form-group { margin-bottom: 10px; }
+      label { display: block; margin-bottom: 5px; }
+      select { width: 100%; padding: 8px; box-sizing: border-box; }
+      button { padding: 10px 15px; background-color: #4285F4; color: white; border: none; cursor: pointer; }
+    </style>
+  </head>
+  <body>
+    <h2>Start Certification</h2>
+    <div class="form-group">
+      <label for="trainee">Select Trainee</label>
+      <select id="trainee" name="trainee"></select>
+    </div>
+    <div class="form-group">
+      <label for="skill">Select Skill</label>
+      <select id="skill" name="skill"></select>
+    </div>
+    <button onclick="startCertification()">Start</button>
+
+    <script>
+      // Populate dropdowns with data from the server
+      google.script.run.withSuccessHandler(populateTrainees).getTrainees();
+      google.script.run.withSuccessHandler(populateSkills).getSkills();
+
+      function populateTrainees(trainees) {
+        const traineeSelect = document.getElementById('trainee');
+        trainees.forEach(trainee => {
+          const option = document.createElement('option');
+          option.value = trainee;
+          option.textContent = trainee;
+          traineeSelect.appendChild(option);
+        });
+      }
+
+      function populateSkills(skills) {
+        const skillSelect = document.getElementById('skill');
+        skills.forEach(skill => {
+          const option = document.createElement('option');
+          option.value = skill;
+          option.textContent = skill;
+          skillSelect.appendChild(option);
+        });
+      }
+
+      function startCertification() {
+        const certificationData = {
+          trainee: document.getElementById('trainee').value,
+          skill: document.getElementById('skill').value
+        };
+        google.script.run.withSuccessHandler(closeDialog).processCertification(certificationData);
+      }
+
+      function closeDialog() {
+        google.script.host.close();
+      }
+    </script>
+  </body>
+</html>
